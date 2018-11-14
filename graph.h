@@ -10,7 +10,7 @@ class Graph {
     public:
         int total_nodes;
         vector<Edge>* graph; 
-        Graph(void);
+        Graph(int total_nodes);
         Graph(char* fname);
         void add(Edge edge);
         void init(int total_nodes);

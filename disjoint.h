@@ -5,6 +5,7 @@ class DisjointSet {
         int *rank;
     public:
         DisjointSet(int total_nodes);
+        void print();
         void init(int total_nodes);
         int find(int u);
         void merge(int x, int y);
@@ -21,16 +22,22 @@ void DisjointSet::init(int total_nodes) {
         this->rank[i] = 0;
     }
 }
-int DisjointSet::find(int u) {
-    if (u != parent[u]) 
-        parent[u] = find(parent[u]); 
-    return parent[u]; 
+
+void DisjointSet::print() {
+    for (int i = 0; i < total_nodes; i++) {
+        cout << this->parent[i] << ", ";
+    }
+    cout << endl;
+}
+int DisjointSet::find(int x) {
+    if (this->parent[x] == x) return x;
+    return find(this->parent[x]);
 }
 
 void DisjointSet::merge(int x, int y) {
     x = find(x), y = find(y); 
-    if (rank[x] > rank[y]) parent[y] = x; 
-    else parent[x] = y; 
-    if (rank[x] == rank[y]) rank[y]++; 
+    if (this->rank[x] > this->rank[y]) this->parent[y] = x; 
+    else this->parent[x] = y; 
+    if (this->rank[x] == this->rank[y]) this->rank[y]++; 
 }
 

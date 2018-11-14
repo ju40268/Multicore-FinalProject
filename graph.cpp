@@ -19,7 +19,7 @@ Graph::Graph(char* fname) {
     infile.close();
 }
 
-Graph::Graph() {
+Graph::Graph(int total_nodes) {
     cout << "Currently init empty mst." << endl;
     init(total_nodes);
 }
@@ -30,7 +30,7 @@ void Graph::init(int total_nodes) {
 }
 
 void Graph::add(Edge edge) {
-    cout << "currently adding the edge" << edge.source << edge.destination << endl;
+    cout << edge.source << edge.destination << edge.cost << endl;
     graph[edge.source].push_back(Edge(edge.source, edge.destination, edge.cost));
     graph[edge.destination].push_back(Edge(edge.destination, edge.source, edge.cost));
 }
