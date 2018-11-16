@@ -1,7 +1,6 @@
 #include <iostream>
 #include <set>
 #include <queue>
-
 #include "graph.h"
 #include "fibonacci.h"
 #include "disjoint.h"
@@ -118,6 +117,6 @@ void connected_component() {
 
 int main(int argc, char** argv) {
     connected_component();
-    // kruskal();
-    // prim();
+    kruskal();
+    prim();
 }
