@@ -6,7 +6,9 @@
 #include "disjoint.h"
 #include "adjMatrix.h"
 using namespace std;
-#define total_nodes 9
+
+priority_queue<Edge, vector<Edge>, EdgeCompare> pq;
+// #define total_nodes 9
 
 // void kruskal() {
 //     Graph* g = new Graph("test3");
@@ -46,47 +48,56 @@ using namespace std;
 //     mst->print();
 // }
 
-// void prim() {
-//     Graph* g = new Graph("test3");
-//     priority_queue<Edge, vector<Edge>, EdgeCompare> pq;
-//     vector<Edge>* graph = g->graph;
-//     int total_nodes = g->total_nodes;
-//     bool visited[total_nodes];
 
-//     Graph* mst = new Graph(total_nodes);
+void update(int v, int u, int weight, bool* visited, int* key, int* parent, vector<Edge>* graph) {
+    if (!visited[v] && key[v] > weight) {
+        key[v] = weight;
+        for (Edge neighbour : graph[v]) {
+            pq.push(neighbour);
+        }
+        parent[v] = u;
+    }
+}
 
-//     int start = 0, count = 0, mstcost = 0, cur = 0;
-//     // mark everything node as not visited
-//     for (int i = 0; i < total_nodes; i++) {
-//         visited[i] = false;
-//     }
-//     for(int i = 0; i < graph[start].size(); i++) {
-//         pq.push(graph[start].at(i));
-//     }
-//     visited[start] = true;
-//     while (count < total_nodes && !pq.empty()) {
-//         Edge e = pq.top(); pq.pop();
-//         if (!visited[e.source] || !visited[e.destination]) {
-//             mst->add(e);
-//             mstcost += e.cost;
-//             if (!visited[e.source]) {
-//                 visited[e.source] = true;
-//                 cur = e.source;
-//             }
-//             if (!visited[e.destination]) {
-//                 visited[e.destination] = true;
-//                 cur = e.destination;
-//             }
-//             for (Edge neighbour : graph[cur]) {
-//                 pq.push(neighbour);
-//             }
-//             count++;
-//         }
-//     }
-//     cout << "final prim cost : " << mstcost << endl;
-//     cout << "mst : " << endl;
-//     mst->print();
-// } 
+void prim() {
+    Graph* g = new Graph("test");   
+    vector<Edge>* graph = g->graph;
+    int total_nodes = g->total_nodes;
+    int* key = new int[total_nodes];
+    int* parent = new int[total_nodes];
+    bool visited[total_nodes];
+
+    Graph* mst = new Graph(total_nodes);
+
+    int start = 0, count = 0, mstcost = 0, cur = 0;
+
+    for (int i = 0; i < total_nodes; i++) {
+        visited[i] = false;
+        key[i] = INT_MAX;
+    }
+    for(int i = 0; i < graph[start].size(); i++) {
+        pq.push(graph[start].at(i));
+    }
+
+    key[start] = 0;
+    visited[start] = true;
+    while (count < total_nodes && !pq.empty()) {
+        Edge e = pq.top(); pq.pop();
+        int u = pq.top().source;
+        pq.pop();
+        visited[u] = true;
+
+        for (int i = 0; i < graph[u].size(); i++) {
+            int v = graph[u].at(i).destination;
+            int weight = graph[u].at(i).cost;
+            update(v, u, weight, visited, key, parent, graph);
+        }
+        count++;
+    }
+    printf(" --- MST Result --- :\nSource - Destination\n");
+        for (int i = 1; i < total_nodes; ++i)
+            printf("%d - %d\n", parent[i], i);
+} 
 
 
 void dfs(int v, bool visited[], vector<Edge>* graph) {
@@ -97,122 +108,28 @@ void dfs(int v, bool visited[], vector<Edge>* graph) {
     }
 }
 
-// void connected_component() {
-//     Graph* g = new Graph("test4");
-//     vector<Edge>* graph = g->graph;
-//     int total_nodes = g->total_nodes;
-//     bool *visited = new bool[total_nodes]; 
-//     int component_count = 0;
+void connected_component() {
+    Graph* g = new Graph("test4");
+    vector<Edge>* graph = g->graph;
+    int total_nodes = g->total_nodes;
+    bool *visited = new bool[total_nodes]; 
+    int component_count = 0;
 
-//     for(int i = 0; i < total_nodes; i++) 
-//         visited[i] = false; 
+    for(int i = 0; i < total_nodes; i++) 
+        visited[i] = false; 
   
-//     for (int i = 0; i < total_nodes; i++) {
-//         if (!visited[i]) {
-//             dfs(i, visited, graph);
-//             component_count++;
-//             cout << endl;
-//         }
-//     }
-//     cout << "Total component count : " << component_count << endl;
-// }
-
-
-int minKey(int key[], bool mstSet[]) { 
-    // Initialize min value 
-    int min = INT_MAX, min_index; 
-    for (int i = 0; i < total_nodes; i++) 
-        if (mstSet[i] == false && key[i] < min) 
-            min = key[i], min_index = i; 
-    
-    return min_index; 
-} 
-
-int printMST(int parent[], int n, int graph[][total_nodes]) { 
-    cout << "Edge \tWeight\n"; 
-    for (int i = 1; i < total_nodes; i++) 
-        printf("%d - %d \t%d \n", parent[i], i, graph[i][parent[i]]); 
-} 
-
-void calculateMST(int graph[][total_nodes]) { 
-    int parent[total_nodes];  
-    int key[total_nodes];  
-    bool mstSet[total_nodes];   
     for (int i = 0; i < total_nodes; i++) {
-        key[i] = INT_MAX, mstSet[i] = false;
-    }
-    key[0] = 0;      
-    parent[0] = -1; 
-    for (int count = 0; count < total_nodes - 1; count++) { 
-        int u = minKey(key, mstSet); 
-        mstSet[u] = true; 
-        for (int v = 0; v < total_nodes; v++) {
-            if (graph[u][v] && mstSet[v] == false && graph[u][v] < key[v]) 
-                parent[v] = u, key[v] = graph[u][v]; 
-        }
-    } 
-    printMST(parent, total_nodes, graph); 
-} 
-
-
-int minKeyParallel(int key[], bool mstSet[], int num_of_threads) { 
-    // Initialize min value 
-    int min = INT_MAX, min_index; 
-    for (int i = 0; i < total_nodes / (num_of_threads); i++) 
-        if (mstSet[i] == false && key[i] < min) 
-            min = key[i], min_index = i; 
-    
-    return min_index; 
-} 
-void parallel_prim_matrix(int graph[][total_nodes]) {
-    int num_of_threads = 5;
-    int element_per_thread = total_nodes / (num_of_threads);
-    int* array_d = new int[total_nodes];
-    int parent[total_nodes];  
-    bool mstSet[total_nodes]; 
-
-    for (int i = 0; i < total_nodes; i++) {
-        array_d[i] = INT_MAX, mstSet[i] = false;
-    }
-
-    #pragma omp parallel for reduction (min:min_index)
-    int min = INT_MAX, min_index; 
-    for (int i = 0; i < total_nodes / (num_of_threads); i++) 
-        if (mstSet[i] == false && array_d[i] < min) 
-            min = array_d[i], min_index = i;
-    
-    for (int count = 0; count < total_nodes - 1; count++) { 
-        int u = min_index;
-        mstSet[u] = true; 
-        for (int v = 0; v < total_nodes; v++) {
-            if (graph[u][v] && mstSet[v] == false && graph[u][v] < array_d[v]) 
-                parent[v] = u, array_d[v] = graph[u][v]; 
+        if (!visited[i]) {
+            dfs(i, visited, graph);
+            component_count++;
+            cout << endl;
         }
     }
-    }
+    cout << "Total component count : " << component_count << endl;
 }
-  
-
-void parallel_prim() {
-    int nodes_local = 0;
-    int total_edges = 14;
-    matrixGraph* mg = new matrixGraph(total_nodes, total_edges);
-    char* fname = "test";
-    ifstream infile(fname);
-    infile >> nodes_local;
-    int source, destination;
-    double cost;
-    while(infile >> source >> destination >> cost) {
-        mg->addedge(source, destination, cost);
-    }
-    infile.close();
-    mg->PrintMG();
-    calculateMST(mg->adjMatrix);
-}
-
 int main(int argc, char** argv) {
-    parallel_prim();
-    // connected_component();
-    // kruskal();
-    // prim();
+    auto start = std::chrono::high_resolution_clock::now();
+    prim();
+    auto totaltime = std::chrono::high_resolution_clock::now() - start;
+    printf("total time : %lld", (totaltime));
 }

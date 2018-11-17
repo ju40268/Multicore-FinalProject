@@ -4,6 +4,10 @@
         "queue": "cpp",
         "memory": "cpp",
         "regex": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "iosfwd": "cpp",
+        "iterator": "cpp",
+        "vector": "cpp",
+        "chrono": "cpp"
     }
 }
