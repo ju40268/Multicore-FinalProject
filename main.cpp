@@ -121,7 +121,6 @@ void dfs(int v, bool visited[], vector<Edge>* graph) {
 int minKey(int key[], bool mstSet[]) { 
     // Initialize min value 
     int min = INT_MAX, min_index; 
-    
     for (int i = 0; i < total_nodes; i++) 
         if (mstSet[i] == false && key[i] < min) 
             min = key[i], min_index = i; 
@@ -144,7 +143,7 @@ void calculateMST(int graph[][total_nodes]) {
     }
     key[0] = 0;      
     parent[0] = -1; 
-    for (int count = 0; count < total_nodes-1; count++) { 
+    for (int count = 0; count < total_nodes - 1; count++) { 
         int u = minKey(key, mstSet); 
         mstSet[u] = true; 
         for (int v = 0; v < total_nodes; v++) {
@@ -154,6 +153,44 @@ void calculateMST(int graph[][total_nodes]) {
     } 
     printMST(parent, total_nodes, graph); 
 } 
+
+
+int minKeyParallel(int key[], bool mstSet[], int num_of_threads) { 
+    // Initialize min value 
+    int min = INT_MAX, min_index; 
+    for (int i = 0; i < total_nodes / (num_of_threads); i++) 
+        if (mstSet[i] == false && key[i] < min) 
+            min = key[i], min_index = i; 
+    
+    return min_index; 
+} 
+void parallel_prim_matrix(int graph[][total_nodes]) {
+    int num_of_threads = 5;
+    int element_per_thread = total_nodes / (num_of_threads);
+    int* array_d = new int[total_nodes];
+    int parent[total_nodes];  
+    bool mstSet[total_nodes]; 
+
+    for (int i = 0; i < total_nodes; i++) {
+        array_d[i] = INT_MAX, mstSet[i] = false;
+    }
+
+    #pragma omp parallel for reduction (min:min_index)
+    int min = INT_MAX, min_index; 
+    for (int i = 0; i < total_nodes / (num_of_threads); i++) 
+        if (mstSet[i] == false && array_d[i] < min) 
+            min = array_d[i], min_index = i;
+    
+    for (int count = 0; count < total_nodes - 1; count++) { 
+        int u = min_index;
+        mstSet[u] = true; 
+        for (int v = 0; v < total_nodes; v++) {
+            if (graph[u][v] && mstSet[v] == false && graph[u][v] < array_d[v]) 
+                parent[v] = u, array_d[v] = graph[u][v]; 
+        }
+    }
+    }
+}
   
 
 void parallel_prim() {

@@ -37,10 +37,10 @@ class matrixGraph {
                 cout << "| "; // Up to here (makes it look cleaner)
                 for( int j = 0; j < n; ++j ) {
                     // This is the actual adjacency matrix being printed out
-                    if ( i == j )
-                        cout << "X ";
+                    // if ( i == j )
+                    //     cout << "X ";
                     
-                    else
+                    // else
                         cout << adjMatrix[i][j] << " ";
                         //cout << adjMatrix[c][x] << " ";
                 }
